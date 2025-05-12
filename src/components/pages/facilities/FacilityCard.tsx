@@ -6,6 +6,7 @@ import { Clock, Users, Check, AlertCircle } from "lucide-react";
 import { FasilitasType } from "@/types";
 import Badge from "@/components/ui/Badge";
 import showRupiah from "@/services/rupiah";
+import { BASE_URL } from "@/services/baseURL";
 
 interface FacilityCardProps {
   facility: FasilitasType;
@@ -24,7 +25,7 @@ export default function FacilityCard({ facility }: FacilityCardProps) {
       <div className="relative h-48">
         {mainImage ? (
           <Image
-            src={mainImage.jalur_gambar}
+            src={`${BASE_URL}/${mainImage.jalur_gambar}`}
             alt={facility.nm_fasilitas}
             fill
             className="object-cover"

@@ -19,6 +19,8 @@ export default function FacilitiesPage() {
     fetchFacilities();
   }, [fetchFacilities]);
 
+  console.log({ facilities });
+
   const filteredFacilities = facilities.filter((facility) => {
     return facility.nm_fasilitas
       .toLowerCase()

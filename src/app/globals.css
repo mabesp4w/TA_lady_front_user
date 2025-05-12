@@ -17,6 +17,23 @@
   --transition-base: all 0.3s ease;
 }
 
+/* ClickerScript-Regular */
+@font-face {
+  font-family: "ClickerScript";
+  src: url("/fonts/ClickerScript-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+/* sofiapro-light.otf */
+@font-face {
+  font-family: "SofiaPro";
+  src: url("/fonts/sofiapro-light.otf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   body {
     @apply bg-gray-50 text-gray-800;

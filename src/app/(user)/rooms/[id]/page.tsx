@@ -15,6 +15,7 @@ import BookingForm from "@/components/pages/rooms/BookingForm";
 import LocationSection from "@/components/pages/rooms/LocationSection";
 import PageContainer from "@/components/layout/PageContainer";
 import FadeIn from "@/components/animation/FadeIn";
+import { RoomBooking } from "@/stores/bookingStore";
 
 export default function RoomDetailPage() {
   const params = useParams();
@@ -32,7 +33,7 @@ export default function RoomDetailPage() {
     checkAuth();
   }, [roomId, getRoom, checkAuth]);
 
-  const handleBookNow = async ({ checkIn, checkOut, totalPrice }) => {
+  const handleBookNow = async ({ checkIn, checkOut, totalPrice }: any) => {
     if (!user) {
       toast.error("Silakan login terlebih dahulu");
       router.push("/login");
@@ -40,7 +41,7 @@ export default function RoomDetailPage() {
     }
 
     const booking = {
-      kamar_id: selectedRoom.id,
+      kamar_id: selectedRoom?.id,
       tanggal_check_in: checkIn,
       tanggal_check_out: checkOut,
       total_harga: totalPrice,
@@ -49,7 +50,7 @@ export default function RoomDetailPage() {
     setIsBookingLoading(true);
 
     try {
-      const success = await createRoomBooking(booking);
+      const success = await createRoomBooking(booking as RoomBooking);
 
       if (success) {
         toast.success("Pemesanan berhasil dibuat");
@@ -76,7 +77,7 @@ export default function RoomDetailPage() {
   return (
     <PageContainer>
       <FadeIn>
-        <ImageGallery images={selectedRoom.gambar_kamar || []} />
+        <ImageGallery images={selectedRoom.gambar_kamar as any} />
       </FadeIn>
 
       <FadeIn delay={0.1}>

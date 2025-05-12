@@ -12,8 +12,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-poppins)", "sans-serif"],
-        playfair: ["var(--font-playfair)", "serif"],
+        clickerscript: ["ClickerScript", "cursive"],
+        sofia: ["SofiaPro", "cursive"],
       },
       colors: {
         primary: {
@@ -38,15 +38,7 @@ const config: Config = {
   },
   plugins: [daisyui],
   daisyui: {
-    themes: [
-      {
-        light: {
-          primary: "#2563eb",
-          secondary: "#f59e0b",
-          accent: "#10b981",
-        },
-      },
-    ],
+    themes: ["light"],
   },
 };
 export default config;

@@ -27,7 +27,7 @@ export const useFacilityStore = create<FacilityState>((set) => ({
         `${BASE_URL}/api/facilities`
       );
 
-      if (response.data.status === "success" && response.data.data) {
+      if (response.data.status && response.data) {
         set({ facilities: response.data.data });
       } else {
         set({ error: response.data.message || "Failed to fetch facilities" });
@@ -47,7 +47,7 @@ export const useFacilityStore = create<FacilityState>((set) => ({
         `${BASE_URL}/api/facilities/${id}`
       );
 
-      if (response.data.status === "success" && response.data.data) {
+      if (response.data.status && response.data.data) {
         set({ selectedFacility: response.data.data });
       } else {
         set({ error: response.data.message || "Failed to fetch facility" });

@@ -3,30 +3,21 @@
 import Link from "next/link";
 import Image from "next/image";
 import Badge from "@/components/ui/Badge";
+import { KamarType } from "@/types";
+import { BASE_URL } from "@/services/baseURL";
+import showRupiah from "@/services/rupiah";
 
 interface RoomCardProps {
-  room: {
-    id: string;
-    no_kamar: string;
-    lantai: string;
-    tersedia: boolean;
-    catatan?: string;
-    roomType?: {
-      nm_jenis_kamar: string;
-      harga_per_malam: number;
-      kapasitas: number;
-    };
-    images?: {
-      jalur_gambar: string;
-      gambar_utama?: boolean;
-    }[];
-  };
+  room: KamarType;
 }
 
 export default function RoomCard({ room }: RoomCardProps) {
+  console.log({ room });
   const getMainImage = () => {
-    if (!room.images || room.images.length === 0) return null;
-    return room.images.find((img) => img.gambar_utama) || room.images[0];
+    if (!room.gambar_kamar || room.gambar_kamar.length === 0) return null;
+    return (
+      room.gambar_kamar.find((img) => img.gambar_utama) || room.gambar_kamar[0]
+    );
   };
 
   const mainImage = getMainImage();
@@ -39,7 +30,7 @@ export default function RoomCard({ room }: RoomCardProps) {
       <div className="relative h-48">
         {mainImage ? (
           <Image
-            src={mainImage.jalur_gambar}
+            src={`${BASE_URL}/${mainImage.jalur_gambar}`}
             alt={room.no_kamar}
             fill
             className="object-cover"
@@ -61,20 +52,20 @@ export default function RoomCard({ room }: RoomCardProps) {
         <div className="flex justify-between items-start">
           <div>
             <h2 className="text-lg font-bold">
-              {room.roomType?.nm_jenis_kamar}
+              {room.jenis_kamar?.nm_jenis_kamar}
             </h2>
             <p className="text-gray-600">
               Kamar {room.no_kamar} - {room.lantai}
             </p>
           </div>
           <span className="text-primary font-bold text-lg">
-            Rp{room.roomType?.harga_per_malam.toLocaleString("id-ID")}
+            {showRupiah(room.jenis_kamar?.harga_per_malam || 0)}
           </span>
         </div>
 
         <div className="mt-3">
           <p className="text-sm text-gray-500">
-            Kapasitas: {room.roomType?.kapasitas} Orang
+            Kapasitas: {room.jenis_kamar?.kapasitas} Orang
           </p>
           {room.catatan && (
             <p className="text-sm text-gray-500 mt-1">{room.catatan}</p>

@@ -3,7 +3,6 @@
 // src/components/navigation/MobileNavbar.tsx
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
 import { motion, AnimatePresence } from "framer-motion";
@@ -68,26 +67,13 @@ export default function MobileNavbar() {
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
         scrolled
           ? "bg-white shadow-md py-2"
-          : "bg-gradient-to-b from-black/60 to-transparent py-3"
+          : "bg-gradient-to-b from-primary to-transparent py-3"
       }`}
     >
       <div className="container mx-auto flex justify-between items-center px-4">
         <Link href="/" className="flex items-center">
-          {/* Ganti dengan logo resort sesuai kebutuhan */}
-          <div className="relative w-8 h-8 mr-2">
-            <Image
-              src="/images/logo.png"
-              alt="Resort Terminal 12"
-              fill
-              className="object-contain"
-              onError={(e) => {
-                e.currentTarget.src =
-                  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z'%3E%3C/path%3E%3Cpolyline points='9 22 9 12 15 12 15 22'%3E%3C/polyline%3E%3C/svg%3E";
-              }}
-            />
-          </div>
           <span
-            className={`font-bold text-lg ${
+            className={`font-bold text-3xl font-clickerscript ${
               scrolled ? "text-primary" : "text-white"
             }`}
           >
@@ -173,15 +159,15 @@ export default function MobileNavbar() {
                     <div className="py-3 px-2 mb-2 border-b border-gray-100">
                       <div className="flex items-center">
                         <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
-                          {user.nama ? (
-                            user.nama.charAt(0).toUpperCase()
+                          {user.name ? (
+                            user.name.charAt(0).toUpperCase()
                           ) : (
                             <User size={20} />
                           )}
                         </div>
                         <div className="ml-3">
                           <p className="font-medium">
-                            {user.nama || "Pengguna"}
+                            {user.name || "Pengguna"}
                           </p>
                           <p className="text-xs text-gray-500">{user.email}</p>
                         </div>

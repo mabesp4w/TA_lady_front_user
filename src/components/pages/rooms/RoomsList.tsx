@@ -2,28 +2,11 @@
 // src/components/rooms/RoomsList.tsx
 import RoomCard from "./RoomCard";
 import EmptyState from "@/components/ui/EmptyState";
+import { KamarType } from "@/types";
 import { Search } from "lucide-react";
 
-interface Room {
-  id: string;
-  no_kamar: string;
-  lantai: string;
-  tersedia: boolean;
-  jenis_kamar_id: string;
-  catatan?: string;
-  roomType?: {
-    nm_jenis_kamar: string;
-    harga_per_malam: number;
-    kapasitas: number;
-  };
-  images?: {
-    jalur_gambar: string;
-    gambar_utama?: boolean;
-  }[];
-}
-
 interface RoomsListProps {
-  rooms: Room[];
+  rooms: KamarType[];
 }
 
 export default function RoomsList({ rooms }: RoomsListProps) {

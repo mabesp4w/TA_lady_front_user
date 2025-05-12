@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { BASE_URL } from "@/services/baseURL";
 
 interface GalleryImage {
   id: number;
@@ -37,7 +38,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
     <div className="relative rounded-lg overflow-hidden">
       <div className="relative h-64">
         <Image
-          src={images[currentImageIndex].jalur_gambar}
+          src={`${BASE_URL}/${images[currentImageIndex].jalur_gambar}`}
           alt={`Room image ${currentImageIndex + 1}`}
           fill
           className="object-cover"
