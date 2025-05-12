@@ -12,7 +12,6 @@ interface RoomCardProps {
 }
 
 export default function RoomCard({ room }: RoomCardProps) {
-  console.log({ room });
   const getMainImage = () => {
     if (!room.gambar_kamar || room.gambar_kamar.length === 0) return null;
     return (

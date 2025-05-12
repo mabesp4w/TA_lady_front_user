@@ -20,8 +20,12 @@ import {
 export default function MobileNavbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { user, logout } = useAuthStore();
+  const { user, logout, checkAuth } = useAuthStore();
   const pathname = usePathname();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   // Deteksi scroll untuk mengubah tampilan navbar
   useEffect(() => {
