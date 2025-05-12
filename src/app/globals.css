@@ -1,8 +1,4 @@
-/**
- * styles/globals.css
- *
- * @format
- */
+/** @format */
 
 @tailwind base;
 @tailwind components;
@@ -11,12 +7,22 @@
 :root {
   --primary-color: #2563eb;
   --primary-dark: #1d4ed8;
+  --secondary-color: #f59e0b;
+  --accent-color: #10b981;
+  --text-color: #1f2937;
+  --text-light: #6b7280;
+  --background-light: #f9fafb;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --transition-base: all 0.3s ease;
 }
 
 @layer base {
   body {
     @apply bg-gray-50 text-gray-800;
   }
+
+  /* Hapus sementara referensi h1, h2, h3 yang menggunakan font-playfair */
 
   input[type="date"],
   input[type="time"] {
@@ -25,25 +31,114 @@
 }
 
 @layer components {
-  .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-colors;
-  }
-  .btn-primary {
-    @apply bg-primary text-white hover:bg-primary-dark;
-  }
-
-  .animate-fadeIn {
-    animation: fadeIn 0.3s ease-in-out;
+  /* Warna untuk tema */
+  :root {
+    --primary-color: #2563eb;
+    --primary-dark: #1d4ed8;
+    --secondary-color: #f59e0b;
+    --accent-color: #10b981;
   }
 
-  @keyframes fadeIn {
-    from {
+  /* Transisi untuk elemen-elemen UI */
+  .transition-base {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  /* Animasi ripple untuk tombol */
+  .btn-ripple {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-ripple::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%, -50%);
+    transform-origin: 50% 50%;
+  }
+
+  .btn-ripple:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+  }
+
+  @keyframes ripple {
+    0% {
+      transform: scale(0, 0);
+      opacity: 0.5;
+    }
+    20% {
+      transform: scale(25, 25);
+      opacity: 0.3;
+    }
+    100% {
+      transform: scale(40, 40);
       opacity: 0;
-      transform: translateY(-10px);
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
+  }
+
+  /* Animasi notifikasi lonceng */
+  @keyframes bellRing {
+    0%,
+    100% {
+      transform: rotate(0);
     }
+    20%,
+    60% {
+      transform: rotate(8deg);
+    }
+    40%,
+    80% {
+      transform: rotate(-8deg);
+    }
+  }
+
+  .animate-bell {
+    animation: bellRing 1s ease-in-out;
+  }
+
+  /* Badge pulse animation */
+  @keyframes badgePulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 6px rgba(37, 99, 235, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+    }
+  }
+
+  .pulse-badge {
+    animation: badgePulse 2s infinite;
+  }
+
+  /* Smoothing for mobile menu transitions */
+  .mobile-menu-enter {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  .mobile-menu-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 200ms, transform 200ms;
+  }
+
+  .mobile-menu-exit {
+    opacity: 1;
+  }
+
+  .mobile-menu-exit-active {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 200ms, transform 200ms;
   }
 }

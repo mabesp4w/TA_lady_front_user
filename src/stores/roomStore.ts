@@ -4,37 +4,12 @@
 import { create } from "zustand";
 import axios from "axios";
 import { BASE_URL } from "@/services/baseURL";
-
-export interface RoomType {
-  id: string;
-  nm_jenis_kamar: string;
-  deskripsi: string | null;
-  kapasitas: number;
-  harga_per_malam: number;
-}
-
-export interface Room {
-  id: string;
-  jenis_kamar_id: string;
-  no_kamar: string;
-  tersedia: boolean;
-  lantai: string;
-  catatan: string | null;
-  roomType?: RoomType;
-  images?: RoomImage[];
-}
-
-export interface RoomImage {
-  id: string;
-  kamar_id: string;
-  jalur_gambar: string;
-  gambar_utama: boolean;
-}
+import { JenisKamarType, KamarType } from "@/types";
 
 interface RoomState {
-  rooms: Room[];
-  roomTypes: RoomType[];
-  selectedRoom: Room | null;
+  rooms: KamarType[];
+  roomTypes: JenisKamarType[];
+  selectedRoom: KamarType | null;
   isLoading: boolean;
   fetchRooms: () => Promise<void>;
   fetchRoomTypes: () => Promise<void>;

@@ -3,9 +3,9 @@
 // src/stores/bookingStore.ts
 import { create } from "zustand";
 import axios from "axios";
-import { Room } from "./roomStore";
-import { Facility } from "./facilityStore";
 import { BASE_URL } from "@/services/baseURL";
+import Cookies from "js-cookie";
+import { FasilitasType, KamarType } from "@/types";
 
 export interface RoomBooking {
   id?: string;
@@ -18,7 +18,7 @@ export interface RoomBooking {
   status?: string;
   metode_pembayaran?: string;
   status_pembayaran?: string;
-  room?: Room;
+  room?: KamarType;
 }
 
 export interface FacilityBooking {
@@ -34,7 +34,7 @@ export interface FacilityBooking {
   status?: string;
   metode_pembayaran?: string;
   status_pembayaran?: string;
-  facility?: Facility;
+  facility?: FasilitasType;
 }
 
 interface BookingState {
@@ -52,7 +52,7 @@ interface BookingState {
   setCurrentFacilityBooking: (booking: FacilityBooking | null) => void;
 }
 
-export const useBookingStore = create<BookingState>((set) => ({
+export const useBookingStore = create<BookingState>((set, get) => ({
   roomBookings: [],
   facilityBookings: [],
   currentRoomBooking: null,
@@ -101,31 +101,51 @@ export const useBookingStore = create<BookingState>((set) => ({
     }
   },
 
-  createFacilityBooking: async (booking) => {
-    set({ isLoading: true });
-    try {
-      const response = await axios.post(
-        `${BASE_URL}/api/facility-bookings`,
-        booking
-      );
-      set((state) => ({
-        facilityBookings: [...state.facilityBookings, response.data],
-        currentFacilityBooking: response.data,
-        isLoading: false,
-      }));
-      return true;
-    } catch (error) {
-      console.log(error);
-      set({ isLoading: false });
-      return false;
-    }
-  },
-
   setCurrentRoomBooking: (booking) => {
     set({ currentRoomBooking: booking });
   },
 
   setCurrentFacilityBooking: (booking) => {
     set({ currentFacilityBooking: booking });
+  },
+
+  createFacilityBooking: async (bookingData) => {
+    set({ isLoading: true });
+
+    try {
+      const token = Cookies.get("token");
+
+      if (!token) {
+        return false;
+      }
+
+      const response = await axios.post(
+        `${BASE_URL}/api/facility-bookings`,
+        bookingData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.status === "success") {
+        // Refresh bookings after creating a new one
+        await get().fetchFacilityBookings();
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error("Error creating facility booking:", error);
+
+      if (axios.isAxiosError(error) && error.response) {
+        console.log({ error });
+      }
+
+      return false;
+    } finally {
+      set({ isLoading: false });
+    }
   },
 }));
