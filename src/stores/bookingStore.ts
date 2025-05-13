@@ -1,6 +1,5 @@
 /** @format */
-
-// src/stores/bookingStore.ts
+// src/stores/bookingStore.ts - Update to include Payment methods
 import { create } from "zustand";
 import axios from "axios";
 import { BASE_URL } from "@/services/baseURL";
@@ -42,6 +41,13 @@ export interface FacilityBooking {
   facility?: FasilitasType;
 }
 
+export interface PaymentData {
+  booking_id: string;
+  booking_type: "kamar" | "fasilitas";
+  payment_method: string;
+  snap_token?: string;
+}
+
 interface BookingState {
   roomBookings: PemesananKamarType[];
   facilityBookings: PemesananFasilitasType[];
@@ -49,6 +55,7 @@ interface BookingState {
   selectedFacilityBooking: PemesananFasilitasType | null;
   currentRoomBooking: RoomBooking | null;
   currentFacilityBooking: FacilityBooking | null;
+  currentPayment: PaymentData | null;
   isLoading: boolean;
   error: string | null;
 
@@ -60,19 +67,18 @@ interface BookingState {
   createFacilityBooking: (booking: FacilityBooking) => Promise<boolean>;
   cancelRoomBooking: (id: string) => Promise<boolean>;
   cancelFacilityBooking: (id: string) => Promise<boolean>;
-  payRoomBooking: (id: string, paymentMethod: string) => Promise<boolean>;
-  payFacilityBooking: (id: string, paymentMethod: string) => Promise<boolean>;
   setCurrentRoomBooking: (booking: RoomBooking | null) => void;
   setCurrentFacilityBooking: (booking: FacilityBooking | null) => void;
 }
 
-export const useBookingStore = create<BookingState>((set, get) => ({
+export const useBookingStore = create<BookingState>((set) => ({
   roomBookings: [],
   facilityBookings: [],
   selectedRoomBooking: null,
   selectedFacilityBooking: null,
   currentRoomBooking: null,
   currentFacilityBooking: null,
+  currentPayment: null,
   isLoading: false,
   error: null,
 
@@ -92,7 +98,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
         },
       });
 
-      if (response.data.status === "success" && response.data.data) {
+      if (response.data.status && response.data.data) {
         set({ roomBookings: response.data.data, isLoading: false });
       } else {
         set({
@@ -125,7 +131,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
         },
       });
 
-      if (response.data.status === "success" && response.data.data) {
+      if (response.data.status && response.data.data) {
         set({ facilityBookings: response.data.data, isLoading: false });
       } else {
         set({
@@ -158,7 +164,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
         },
       });
 
-      if (response.data.status === "success" && response.data.data) {
+      if (response.data.status && response.data.data) {
         set({ selectedRoomBooking: response.data.data, isLoading: false });
       } else {
         set({
@@ -195,7 +201,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
         }
       );
 
-      if (response.data.status === "success" && response.data.data) {
+      if (response.data.status && response.data.data) {
         set({ selectedFacilityBooking: response.data.data, isLoading: false });
       } else {
         set({
@@ -234,7 +240,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
         }
       );
 
-      if (response.data.status === "success" && response.data.data) {
+      if (response.data.status && response.data.data) {
         set((state) => ({
           roomBookings: [...state.roomBookings, response.data.data],
           currentRoomBooking: response.data.data,
@@ -288,7 +294,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
         }
       );
 
-      if (response.data.status === "success" && response.data.data) {
+      if (response.data.status && response.data.data) {
         set((state) => ({
           facilityBookings: [...state.facilityBookings, response.data.data],
           currentFacilityBooking: response.data.data,
@@ -342,7 +348,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
         }
       );
 
-      if (response.data.status === "success") {
+      if (response.data.status) {
         // Update the room booking in the list
         set((state) => ({
           roomBookings: state.roomBookings.map((booking) =>
@@ -401,7 +407,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
         }
       );
 
-      if (response.data.status === "success") {
+      if (response.data.status) {
         // Update the facility booking in the list
         set((state) => ({
           facilityBookings: state.facilityBookings.map((booking) =>
@@ -434,113 +440,6 @@ export const useBookingStore = create<BookingState>((set, get) => ({
       } else {
         set({
           error: "Failed to cancel facility booking. Please try again later.",
-          isLoading: false,
-        });
-      }
-      return false;
-    }
-  },
-
-  payRoomBooking: async (id: string, paymentMethod: string) => {
-    set({ isLoading: true, error: null });
-    try {
-      const token = Cookies.get("token");
-
-      if (!token) {
-        set({ error: "Authentication required", isLoading: false });
-        return false;
-      }
-
-      const response = await axios.post(
-        `${BASE_URL}/api/room-bookings/${id}/payment`,
-        {
-          metode_pembayaran: paymentMethod,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.data.status === "success" && response.data.data) {
-        // Update the room booking in the list
-        await get().getRoomBooking(id);
-        await get().fetchRoomBookings();
-        return true;
-      } else {
-        set({
-          error: response.data.message || "Failed to process payment",
-          isLoading: false,
-        });
-        return false;
-      }
-    } catch (error) {
-      console.error(`Error processing payment for room booking ${id}:`, error);
-
-      if (axios.isAxiosError(error) && error.response) {
-        set({
-          error: error.response.data.message || "Failed to process payment",
-          isLoading: false,
-        });
-      } else {
-        set({
-          error: "Failed to process payment. Please try again later.",
-          isLoading: false,
-        });
-      }
-      return false;
-    }
-  },
-
-  payFacilityBooking: async (id: string, paymentMethod: string) => {
-    set({ isLoading: true, error: null });
-    try {
-      const token = Cookies.get("token");
-
-      if (!token) {
-        set({ error: "Authentication required", isLoading: false });
-        return false;
-      }
-
-      const response = await axios.post(
-        `${BASE_URL}/api/facility-bookings/${id}/payment`,
-        {
-          metode_pembayaran: paymentMethod,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.data.status === "success" && response.data.data) {
-        // Update the facility booking in the list
-        await get().getFacilityBooking(id);
-        await get().fetchFacilityBookings();
-        return true;
-      } else {
-        set({
-          error: response.data.message || "Failed to process payment",
-          isLoading: false,
-        });
-        return false;
-      }
-    } catch (error) {
-      console.error(
-        `Error processing payment for facility booking ${id}:`,
-        error
-      );
-
-      if (axios.isAxiosError(error) && error.response) {
-        set({
-          error: error.response.data.message || "Failed to process payment",
-          isLoading: false,
-        });
-      } else {
-        set({
-          error: "Failed to process payment. Please try again later.",
           isLoading: false,
         });
       }

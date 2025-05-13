@@ -129,6 +129,13 @@ export interface PemesananFasilitasType extends BaseModel {
   status_pembayaran: "belum_dibayar" | "dibayar" | "dikembalikan";
   user?: UserType; // Relation
   fasilitas?: FasilitasType; // Relation
+  pembayaran?: {
+    id: string | number;
+    jumlah: number;
+    metode_pembayaran: string;
+    status: string;
+    created_at: string;
+  }[];
 }
 
 // Pesanan (Order)

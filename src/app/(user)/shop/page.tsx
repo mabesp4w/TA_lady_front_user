@@ -88,7 +88,7 @@ export default function ShopPage() {
       />
 
       <ProductGrid
-        products={filteredProducts}
+        products={filteredProducts as any}
         quantities={quantities}
         onIncrement={incrementQuantity}
         onDecrement={decrementQuantity}

@@ -1,7 +1,6 @@
 /** @format */
 // src/components/rooms/BookingForm.tsx
 import { useState, useEffect } from "react";
-import { Calendar } from "lucide-react";
 import moment from "moment";
 import Button from "@/components/ui/Button";
 
@@ -66,10 +65,6 @@ export default function BookingForm({
               value={checkInDate}
               onChange={(e) => setCheckInDate(e.target.value)}
             />
-            <Calendar
-              className="absolute right-3 top-3.5 text-gray-400"
-              size={18}
-            />
           </div>
         </div>
 
@@ -82,10 +77,6 @@ export default function BookingForm({
               min={checkInDate || moment().add(1, "days").format("YYYY-MM-DD")}
               value={checkOutDate}
               onChange={(e) => setCheckOutDate(e.target.value)}
-            />
-            <Calendar
-              className="absolute right-3 top-3.5 text-gray-400"
-              size={18}
             />
           </div>
         </div>

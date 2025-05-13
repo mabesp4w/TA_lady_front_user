@@ -56,7 +56,7 @@ export default function RoomSection() {
         animate={inView ? "show" : "hidden"}
       >
         <div className="flex space-x-4">
-          {rooms.slice(0, 4).map((room) => {
+          {rooms?.slice(0, 4).map((room) => {
             const roomImage =
               room?.gambar_kamar?.find((img) => img.gambar_utama) ||
               room?.gambar_kamar?.[0];
