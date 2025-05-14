@@ -23,7 +23,7 @@ export default function RoomDetailPage() {
   const roomId = params.id as string;
 
   const { selectedRoom, getRoom, isLoading } = useRoomStore();
-  const { createRoomBooking, error } = useBookingStore();
+  const { createRoomBooking } = useBookingStore();
   const { user, checkAuth } = useAuthStore();
 
   const [isBookingLoading, setIsBookingLoading] = useState(false);
@@ -52,15 +52,18 @@ export default function RoomDetailPage() {
     try {
       const success = await createRoomBooking(booking as RoomBooking);
 
+      // Ambil error terbaru langsung dari store setelah operasi selesai
+      const currentError = useBookingStore.getState().error;
+
       if (success) {
         toast.success("Pemesanan berhasil dibuat");
         router.push("/bookings");
       } else {
-        toast.error(error);
+        toast.error(currentError);
       }
     } catch (error) {
-      console.error("Error creating booking:", error);
-      toast.error("Terjadi kesalahan saat membuat pemesanan");
+      console.error(error);
+      toast.error(error as string);
     } finally {
       setIsBookingLoading(false);
     }

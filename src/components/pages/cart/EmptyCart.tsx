@@ -1,23 +1,23 @@
 /** @format */
-// src/components/cart/EmptyCart.tsx
-import { ShoppingBag } from "lucide-react";
+// src/components/pages/cart/EmptyCart.tsx
+import { ShoppingCart } from "lucide-react";
 import Button from "@/components/ui/Button";
 
 interface EmptyCartProps {
-  onShopNow: () => void;
+  onContinueShopping: () => void;
 }
 
-export default function EmptyCart({ onShopNow }: EmptyCartProps) {
+export default function EmptyCart({ onContinueShopping }: EmptyCartProps) {
   return (
-    <div className="text-center py-10 bg-white rounded-lg shadow-md">
-      <ShoppingBag size={64} className="mx-auto text-gray-300" />
-      <h2 className="text-xl font-semibold mt-4">Keranjang Belanja Kosong</h2>
-      <p className="text-gray-500 mt-2">
-        Tambahkan beberapa produk ke keranjang belanja Anda.
+    <div className="flex flex-col items-center justify-center py-12">
+      <div className="bg-gray-100 p-6 rounded-full mb-6">
+        <ShoppingCart size={64} className="text-gray-400" />
+      </div>
+      <h2 className="text-2xl font-semibold mb-2">Keranjang Anda Kosong</h2>
+      <p className="text-gray-500 mb-6 text-center max-w-md">
+        Sepertinya Anda belum menambahkan produk apapun ke keranjang Anda
       </p>
-      <Button variant="primary" className="mt-6" onClick={onShopNow}>
-        Belanja Sekarang
-      </Button>
+      <Button onClick={onContinueShopping}>Lanjutkan Belanja</Button>
     </div>
   );
 }

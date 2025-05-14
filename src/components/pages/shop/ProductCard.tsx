@@ -2,8 +2,12 @@
 // src/components/shop/ProductCard.tsx
 import Image from "next/image";
 import { ShoppingCart } from "lucide-react";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import QuantitySelector from "./QuantitySelector";
 import Button from "@/components/ui/Button";
+import { useAuthStore } from "@/stores/authStore";
+import { useCartStore } from "@/stores/cartStore";
 
 interface Product {
   id: string;
@@ -26,63 +30,75 @@ export default function ProductCard({
   quantity,
   onIncrement,
   onDecrement,
-  onAddToCart,
 }: ProductCardProps) {
+  const router = useRouter();
+  const { user } = useAuthStore();
+  const { addToCart } = useCartStore();
+
+  // Fungsi untuk menangani penambahan ke keranjang dengan verifikasi login
+  const handleAddToCart = async () => {
+    // Cek apakah user sudah login
+    if (!user) {
+      toast.error("Silakan login terlebih dahulu");
+      router.push("/login");
+      return;
+    }
+
+    // Jika sudah login, tambahkan ke keranjang
+    const success = await addToCart(product.id, quantity);
+    if (success) {
+      toast.success(`${product.nm_produk} ditambahkan ke keranjang`);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:shadow-lg hover:translate-y-[-2px]">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden">
       {product.jalur_gambar ? (
-        <div className="relative h-36">
+        <div className="relative h-48 w-full">
           <Image
             src={product.jalur_gambar}
             alt={product.nm_produk}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover"
           />
           {!product.tersedia && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                Habis
-              </span>
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+              <span className="text-white text-lg font-semibold">Habis</span>
             </div>
           )}
         </div>
       ) : (
-        <div className="h-36 bg-gray-200 flex items-center justify-center">
-          <span className="text-gray-500 text-sm">No Image</span>
+        <div className="h-48 w-full bg-gray-200 flex items-center justify-center">
+          No Image
         </div>
       )}
 
-      <div className="p-3">
-        <h2 className="font-semibold text-sm truncate">{product.nm_produk}</h2>
-        <p className="text-primary font-bold mt-1">
+      <div className="p-4">
+        <h3 className="text-lg font-semibold mb-2">{product.nm_produk}</h3>
+        <p className="text-lg font-bold text-primary mb-4">
           Rp{product.harga.toLocaleString("id-ID")}
         </p>
 
         {product.tersedia ? (
           <>
-            <div className="flex items-center justify-between mt-2">
+            <div className="mb-4">
               <QuantitySelector
                 quantity={quantity}
                 onIncrement={onIncrement}
                 onDecrement={onDecrement}
               />
             </div>
-
             <Button
-              variant="primary"
-              className="mt-3 w-full text-sm"
-              icon={<ShoppingCart size={16} />}
-              onClick={onAddToCart}
+              icon={<ShoppingCart size={18} />}
+              onClick={handleAddToCart}
+              className="w-full"
             >
               Tambah
             </Button>
           </>
         ) : (
-          <Button
-            variant="secondary"
-            className="mt-3 w-full text-sm opacity-70"
-            disabled
-          >
+          <Button disabled className="w-full">
             Habis
           </Button>
         )}

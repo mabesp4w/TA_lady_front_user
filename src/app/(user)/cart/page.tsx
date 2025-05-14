@@ -2,107 +2,116 @@
 // src/app/cart/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useProductStore } from "@/stores/productStore";
-import { useAuthStore } from "@/stores/authStore";
+import { useCartStore } from "@/stores/cartStore";
 import toast from "react-hot-toast";
 import axios from "axios";
 import CartItem from "@/components/pages/cart/CartItem";
 import CartSummary from "@/components/pages/cart/CartSummary";
 import EmptyCart from "@/components/pages/cart/EmptyCart";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { BASE_URL } from "@/services/baseURL";
+import withAuth from "@/components/hoc/withAuth";
+import Cookies from "js-cookie";
 
-export default function CartPage() {
+function CartPage() {
   const router = useRouter();
-  const { cart, removeFromCart, updateCartQuantity, clearCart, isLoading } =
-    useProductStore();
-  const { user, checkAuth } = useAuthStore();
-  const [isProcessing, setIsProcessing] = useState(false);
+  const {
+    cart,
+    fetchCart,
+    removeFromCart,
+    updateCartItem,
+    clearCart,
+    isLoading,
+  } = useCartStore();
 
+  // Efek terpisah untuk mengambil keranjang atau redirect
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+    fetchCart();
+  }, [fetchCart]);
 
   const totalAmount = cart.reduce((total, item) => {
-    return total + item.product.harga * item.quantity;
+    return total + (item.produk?.harga || 0) * item.jumlah;
   }, 0);
 
-  const handleCheckout = async () => {
-    if (!user) {
-      toast.error("Silakan login terlebih dahulu");
-      router.push("/login");
-      return;
-    }
+  const handleUpdateQuantity = (id: string, jumlah: number) => {
+    updateCartItem(id, jumlah);
+  };
 
+  const handleRemoveItem = (id: string) => {
+    removeFromCart(id);
+    toast.success("Item berhasil dihapus dari keranjang");
+  };
+
+  const handleCheckout = async () => {
     if (cart.length === 0) {
       toast.error("Keranjang belanja kosong");
       return;
     }
-
-    setIsProcessing(true);
 
     try {
       // Create an order
       const orderData = {
         jenis_pesanan: "online",
         items: cart.map((item) => ({
-          produk_id: item.product.id,
-          jumlah: item.quantity,
-          harga_satuan: item.product.harga,
-          subtotal: item.product.harga * item.quantity,
+          produk_id: item.produk_id,
+          jumlah: item.jumlah,
+          harga_satuan: item.produk?.harga || 0,
+          subtotal: (item.produk?.harga || 0) * item.jumlah,
         })),
         total_jumlah: totalAmount,
       };
 
-      const response = await axios.post("/api/orders", orderData);
+      const response = await axios.post(`${BASE_URL}/api/orders`, orderData, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("token")}`,
+        },
+      });
+
       if (response.data) {
         clearCart();
         router.push(`/orders/${response.data.id}`);
         toast.success("Pesanan berhasil dibuat");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating order:", error);
-      toast.error("Gagal memproses pesanan");
-    } finally {
-      setIsProcessing(false);
+      toast.error(error.response?.data?.message || "Gagal memproses pesanan");
     }
   };
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-12">
-        <LoadingSpinner size="lg" text="Memuat keranjang..." />
+      <div className="container mx-auto p-4 flex items-center justify-center min-h-screen">
+        <LoadingSpinner />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Keranjang Belanja</h1>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-6">Keranjang Belanja</h1>
 
       {cart.length > 0 ? (
         <>
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-6 mb-6">
             {cart.map((item) => (
               <CartItem
-                key={item.product.id}
+                key={item.id}
                 item={item as any}
-                onRemove={removeFromCart}
-                onUpdateQuantity={updateCartQuantity}
+                onUpdateQuantity={handleUpdateQuantity}
+                onRemove={handleRemoveItem}
               />
             ))}
           </div>
 
-          <CartSummary
-            totalAmount={totalAmount}
-            onCheckout={handleCheckout}
-            isProcessing={isProcessing}
-          />
+          <CartSummary totalAmount={totalAmount} onCheckout={handleCheckout} />
         </>
       ) : (
-        <EmptyCart onShopNow={() => router.push("/shop")} />
+        <EmptyCart onContinueShopping={() => router.push("/shop")} />
       )}
     </div>
   );
 }
+
+export default withAuth(CartPage);

@@ -1,82 +1,84 @@
 /** @format */
-// src/components/cart/CartItem.tsx
+// src/components/pages/cart/CartItem.tsx
 import Image from "next/image";
-import { Trash2, ShoppingBag } from "lucide-react";
-import QuantitySelector from "../shop/QuantitySelector";
+import { Trash2 } from "lucide-react";
+import { KeranjangType } from "@/types";
+import QuantitySelector from "@/components/pages/shop/QuantitySelector";
+import Button from "@/components/ui/Button";
 
 interface CartItemProps {
-  item: {
-    product: {
-      id: string;
-      nm_produk: string;
-      harga: number;
-      jalur_gambar?: string;
-    };
-    quantity: number;
-  };
-  onRemove: (productId: string) => void;
-  onUpdateQuantity: (productId: string, quantity: number) => void;
+  item: KeranjangType;
+  onUpdateQuantity: (id: string, quantity: number) => void;
+  onRemove: (id: string) => void;
 }
 
 export default function CartItem({
   item,
-  onRemove,
   onUpdateQuantity,
+  onRemove,
 }: CartItemProps) {
-  const { product, quantity } = item;
-  const subtotal = product.harga * quantity;
-
   const handleIncrement = () => {
-    onUpdateQuantity(product.id, quantity + 1);
+    onUpdateQuantity(item.id, item.jumlah + 1);
   };
 
   const handleDecrement = () => {
-    if (quantity > 1) {
-      onUpdateQuantity(product.id, quantity - 1);
+    if (item.jumlah > 1) {
+      onUpdateQuantity(item.id, item.jumlah - 1);
     }
   };
 
+  const subtotal = (item.produk?.harga || 0) * item.jumlah;
+
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 flex">
-      <div className="relative h-20 w-20 flex-shrink-0">
-        {product.jalur_gambar ? (
+    <div className="bg-white rounded-lg shadow-sm p-4 flex flex-col md:flex-row gap-4">
+      {/* Product Image */}
+      {item.produk?.jalur_gambar ? (
+        <div className="relative h-24 w-24 md:h-32 md:w-32 flex-shrink-0">
           <Image
-            src={product.jalur_gambar}
-            alt={product.nm_produk}
+            src={item.produk.jalur_gambar}
+            alt={item.produk.nm_produk}
             fill
+            sizes="(max-width: 768px) 96px, 128px"
             className="object-cover rounded-md"
           />
-        ) : (
-          <div className="h-full w-full bg-gray-200 flex items-center justify-center rounded-md">
-            <ShoppingBag size={24} className="text-gray-400" />
-          </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="h-24 w-24 md:h-32 md:w-32 bg-gray-200 flex items-center justify-center rounded-md flex-shrink-0">
+          No Image
+        </div>
+      )}
 
-      <div className="ml-4 flex-1">
-        <div className="flex justify-between">
-          <h3 className="font-semibold">{product.nm_produk}</h3>
-          <button
-            className="text-red-500 hover:text-red-700 transition-colors"
-            onClick={() => onRemove(product.id)}
-            aria-label="Remove from cart"
-          >
-            <Trash2 size={18} />
-          </button>
+      {/* Product Details */}
+      <div className="flex-grow flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h3 className="text-lg font-semibold">{item.produk?.nm_produk}</h3>
+          <p className="text-gray-600">
+            Rp{(item.produk?.harga || 0).toLocaleString("id-ID")}
+          </p>
         </div>
 
-        <p className="text-primary font-bold mt-1">
-          Rp{product.harga.toLocaleString("id-ID")}
-        </p>
-
-        <div className="flex justify-between items-center mt-2">
+        {/* Quantity & Actions */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <QuantitySelector
-            quantity={quantity}
+            quantity={item.jumlah}
             onIncrement={handleIncrement}
             onDecrement={handleDecrement}
           />
 
-          <p className="font-bold">Rp{subtotal.toLocaleString("id-ID")}</p>
+          <div className="flex flex-col items-end">
+            <p className="font-bold text-primary mb-2">
+              Rp{subtotal.toLocaleString("id-ID")}
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-red-500 border-red-500 hover:bg-red-50"
+              onClick={() => onRemove(item.id)}
+              icon={<Trash2 size={16} />}
+            >
+              Hapus
+            </Button>
+          </div>
         </div>
       </div>
     </div>

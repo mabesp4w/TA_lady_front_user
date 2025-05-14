@@ -1,47 +1,43 @@
 /** @format */
-// src/components/cart/CartSummary.tsx
+// src/components/pages/cart/CartSummary.tsx
 import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
+import { ShoppingBag } from "lucide-react";
 
 interface CartSummaryProps {
   totalAmount: number;
   onCheckout: () => void;
-  isProcessing: boolean;
 }
 
 export default function CartSummary({
   totalAmount,
   onCheckout,
-  isProcessing,
 }: CartSummaryProps) {
   return (
-    <Card>
-      <div className="space-y-2">
-        <div className="flex justify-between">
-          <span className="text-gray-600">Subtotal</span>
-          <span>Rp{totalAmount.toLocaleString("id-ID")}</span>
-        </div>
+    <div className="bg-white rounded-lg shadow-sm p-6">
+      <h2 className="text-xl font-semibold mb-4">Ringkasan Belanja</h2>
 
-        <div className="border-t border-gray-100 pt-2 mt-2">
-          <div className="flex justify-between font-bold">
-            <span>Total</span>
-            <span className="text-primary">
-              Rp{totalAmount.toLocaleString("id-ID")}
-            </span>
-          </div>
+      <div className="border-t border-b py-4 my-4">
+        <div className="flex justify-between mb-2">
+          <span>Total Harga</span>
+          <span>Rp{totalAmount.toLocaleString("id-ID")}</span>
         </div>
       </div>
 
+      <div className="flex justify-between font-bold text-lg mb-6">
+        <span>Total Pembayaran</span>
+        <span className="text-primary">
+          Rp{totalAmount.toLocaleString("id-ID")}
+        </span>
+      </div>
+
       <Button
-        variant="primary"
+        className="w-full"
         size="lg"
-        className="w-full mt-4"
         onClick={onCheckout}
-        isLoading={isProcessing}
-        disabled={isProcessing || totalAmount <= 0}
+        icon={<ShoppingBag size={18} />}
       >
-        Checkout
+        Checkout Sekarang
       </Button>
-    </Card>
+    </div>
   );
 }

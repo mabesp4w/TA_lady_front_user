@@ -4,29 +4,33 @@
 
 import { useEffect, useState } from "react";
 import { useProductStore } from "@/stores/productStore";
+import { useCartStore } from "@/stores/cartStore";
+import { useAuthStore } from "@/stores/authStore";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import ProductFilter from "@/components/pages/shop/ProductFilter";
 import ProductGrid from "@/components/pages/shop/ProductGrid";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function ShopPage() {
-  const {
-    products,
-    categories,
-    fetchProducts,
-    fetchCategories,
-    addToCart,
-    isLoading,
-  } = useProductStore();
+  const router = useRouter();
+  const { products, categories, fetchProducts, fetchCategories, isLoading } =
+    useProductStore();
+  const { addToCart } = useCartStore();
+  const { user, checkAuth } = useAuthStore();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   useEffect(() => {
+    // Periksa status login
+    checkAuth();
+
+    // Ambil produk dan kategori
     fetchProducts();
     fetchCategories();
-  }, [fetchProducts, fetchCategories]);
+  }, [fetchProducts, fetchCategories, checkAuth]);
 
   useEffect(() => {
     // Initialize quantities
@@ -61,30 +65,40 @@ export default function ShopPage() {
     }));
   };
 
-  const handleAddToCart = (product: any) => {
+  const handleAddToCart = async (product: any) => {
+    // Cek apakah user sudah login
+    if (!user) {
+      toast.error("Silakan login terlebih dahulu");
+      router.push("/login");
+      return;
+    }
+
     const quantity = quantities[product.id] || 1;
-    addToCart(product, quantity);
-    toast.success(`${product.nm_produk} ditambahkan ke keranjang`);
+    const success = await addToCart(product.id, quantity);
+
+    if (success) {
+      toast.success(`${product.nm_produk} ditambahkan ke keranjang`);
+    }
   };
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-12">
-        <LoadingSpinner size="lg" text="Memuat produk..." />
+      <div className="container mx-auto p-4 flex items-center justify-center min-h-screen">
+        <LoadingSpinner />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Toko Produk</h1>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-6">Toko Produk</h1>
 
       <ProductFilter
+        categories={categories}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
-        categories={categories}
       />
 
       <ProductGrid

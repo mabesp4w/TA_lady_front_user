@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import moment from "moment";
 import Button from "@/components/ui/Button";
+import showRupiah from "@/services/rupiah";
 
 interface BookingFormProps {
   roomPrice: number;
@@ -85,7 +86,7 @@ export default function BookingForm({
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="flex justify-between mb-2">
               <span className="text-gray-600">Harga per malam</span>
-              <span>Rp{roomPrice.toLocaleString("id-ID")}</span>
+              <span>{showRupiah(roomPrice)}</span>
             </div>
             <div className="flex justify-between mb-2">
               <span className="text-gray-600">Jumlah malam</span>
@@ -93,7 +94,7 @@ export default function BookingForm({
             </div>
             <div className="flex justify-between font-bold pt-2 border-t border-gray-200">
               <span>Total</span>
-              <span>Rp{totalPrice.toLocaleString("id-ID")}</span>
+              <span>{showRupiah(totalPrice)}</span>
             </div>
           </div>
         )}

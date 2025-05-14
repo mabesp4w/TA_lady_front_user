@@ -184,6 +184,15 @@ export interface PembayaranType extends BaseModel {
   pesanan?: PesananType; // Relation
 }
 
+// keranjang
+export interface KeranjangType extends BaseModel {
+  user_id: string;
+  produk_id: string;
+  jumlah: number;
+  user?: UserType; // Relation
+  produk?: ProdukType; // Relation
+}
+
 // Midtrans Transactions
 export interface MidtransTransactionType extends BaseModel {
   order_id: string;
