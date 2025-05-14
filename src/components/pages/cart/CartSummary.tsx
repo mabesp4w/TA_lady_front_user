@@ -1,16 +1,17 @@
 /** @format */
 // src/components/pages/cart/CartSummary.tsx
 import Button from "@/components/ui/Button";
-import { ShoppingBag } from "lucide-react";
 
 interface CartSummaryProps {
   totalAmount: number;
   onCheckout: () => void;
+  isLoading: boolean;
 }
 
 export default function CartSummary({
   totalAmount,
   onCheckout,
+  isLoading,
 }: CartSummaryProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
@@ -31,12 +32,12 @@ export default function CartSummary({
       </div>
 
       <Button
-        className="w-full"
-        size="lg"
         onClick={onCheckout}
-        icon={<ShoppingBag size={18} />}
+        variant="primary"
+        className="w-full"
+        disabled={isLoading}
       >
-        Checkout Sekarang
+        {isLoading ? "Memproses..." : "Checkout"}
       </Button>
     </div>
   );

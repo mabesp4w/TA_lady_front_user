@@ -4,8 +4,10 @@
 
 import { useEffect, useState } from "react";
 import { useBookingStore } from "@/stores/bookingStore";
+import { useOrderStore } from "@/stores/orderStore"; // New store for orders
 import BookingTabs from "@/components/pages/bookings/BookingTabs";
 import BookingsList from "@/components/pages/bookings/BookingsList";
+import OrdersList from "@/components/pages/bookings/OrdersList"; // New component for orders
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
@@ -19,14 +21,20 @@ function BookingsPage() {
     facilityBookings,
     fetchRoomBookings,
     fetchFacilityBookings,
-    isLoading,
+    isLoading: bookingsLoading,
   } = useBookingStore();
+
+  const { orders, fetchOrders, isLoading: ordersLoading } = useOrderStore();
+
   const [activeTab, setActiveTab] = useState("rooms");
 
   useEffect(() => {
     fetchRoomBookings();
     fetchFacilityBookings();
-  }, [fetchRoomBookings, fetchFacilityBookings]);
+    fetchOrders();
+  }, [fetchRoomBookings, fetchFacilityBookings, fetchOrders]);
+
+  const isLoading = bookingsLoading || ordersLoading;
 
   if (isLoading) {
     return (
@@ -47,10 +55,14 @@ function BookingsPage() {
       </FadeIn>
 
       <Stagger>
-        <BookingsList
-          type={activeTab as "rooms" | "facilities"}
-          bookings={activeTab === "rooms" ? roomBookings : facilityBookings}
-        />
+        {activeTab === "orders" ? (
+          <OrdersList orders={orders} />
+        ) : (
+          <BookingsList
+            type={activeTab as "rooms" | "facilities"}
+            bookings={activeTab === "rooms" ? roomBookings : facilityBookings}
+          />
+        )}
       </Stagger>
     </PageContainer>
   );
