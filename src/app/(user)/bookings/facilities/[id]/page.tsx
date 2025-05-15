@@ -1,9 +1,9 @@
 /** @format */
-// src/app/bookings/facilities/[id]/page.tsx - Update to add payment button
+// src/app/bookings/facilities/[id]/page.tsx - Update to add payment functionality
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useBookingStore } from "@/stores/bookingStore";
 import moment from "moment";
 import toast from "react-hot-toast";
@@ -15,10 +15,10 @@ import FadeIn from "@/components/animation/FadeIn";
 import withAuth from "@/components/hoc/withAuth";
 import Link from "next/link";
 import Image from "next/image";
+import { usePaymentStore } from "@/stores/paymentStore";
 
 function FacilityBookingDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const bookingId = params.id as string;
 
   const {
@@ -28,13 +28,34 @@ function FacilityBookingDetailPage() {
     isLoading,
   } = useBookingStore();
 
+  const {
+    handlePayment,
+    isLoading: isPaymentLoading,
+    loadMidtransScript,
+  } = usePaymentStore();
+
   const [isActionLoading, setIsActionLoading] = useState(false);
 
   useEffect(() => {
     if (bookingId) {
       getFacilityBooking(bookingId);
     }
-  }, [bookingId, getFacilityBooking]);
+    // Load Midtrans script on component mount
+    loadMidtransScript();
+  }, [bookingId, getFacilityBooking, loadMidtransScript]);
+
+  const onPayment = async () => {
+    await handlePayment({
+      paymentType: "fasilitas",
+      paymentId: bookingId,
+      onSuccess: () => {
+        getFacilityBooking(bookingId); // Refresh data setelah pembayaran berhasil
+      },
+      onPending: () => {
+        getFacilityBooking(bookingId); // Refresh data setelah pembayaran pending
+      },
+    });
+  };
 
   if (isLoading || !selectedFacilityBooking) {
     return (
@@ -63,10 +84,6 @@ function FacilityBookingDetailPage() {
         setIsActionLoading(false);
       }
     }
-  };
-
-  const handlePaymentRedirect = () => {
-    router.push(`/payment/facilities/${bookingId}`);
   };
 
   const formatDate = (date: string) => {
@@ -258,6 +275,7 @@ function FacilityBookingDetailPage() {
                           dangerouslySetInnerHTML={{
                             __html: atob(selectedFacilityBooking.barcode),
                           }}
+                          className="w-64 h-64"
                         />
                       </div>
                     </div>
@@ -273,8 +291,9 @@ function FacilityBookingDetailPage() {
               {isBookingPayable && (
                 <Button
                   variant="primary"
-                  onClick={handlePaymentRedirect}
-                  disabled={isActionLoading}
+                  onClick={onPayment}
+                  disabled={isActionLoading || isPaymentLoading}
+                  isLoading={isPaymentLoading}
                 >
                   Bayar Sekarang
                 </Button>

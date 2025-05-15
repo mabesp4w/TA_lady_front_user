@@ -1,11 +1,12 @@
 /** @format */
 
-// src/stores/paymentStore.ts
+// src/stores/paymentStore.ts - Perbarui dengan opsi untuk menggunakan pembayaran yang sudah ada
 
 import { create } from "zustand";
 import toast from "react-hot-toast";
 import {
   createPayment,
+  getExistingPayment,
   openSnapMidtrans,
   MidtransPaymentOptions,
 } from "@/services/midtransService";
@@ -14,11 +15,12 @@ interface PaymentState {
   isLoading: boolean;
   isMidtransScriptLoaded: boolean;
   error: string | null;
-
   // Actions
   setMidtransScriptLoaded: (loaded: boolean) => void;
   loadMidtransScript: () => void;
-  handlePayment: (options: MidtransPaymentOptions) => Promise<boolean>;
+  handlePayment: (
+    options: MidtransPaymentOptions & { useExisting?: boolean }
+  ) => Promise<boolean>;
 }
 
 export const usePaymentStore = create<PaymentState>((set, get) => ({
@@ -32,7 +34,6 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
 
   loadMidtransScript: () => {
     if (get().isMidtransScriptLoaded) return;
-
     // Cek jika script sudah ada di halaman
     if (
       typeof window !== "undefined" &&
@@ -47,7 +48,6 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
         process.env.NODE_ENV === "production"
           ? "https://app.midtrans.com/snap/snap.js"
           : "https://app.sandbox.midtrans.com/snap/snap.js";
-
       const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || "";
 
       const script = document.createElement("script");
@@ -71,12 +71,11 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
   },
 
   handlePayment: async (options) => {
-    const { paymentType, paymentId } = options;
+    const { paymentType, paymentId, useExisting = false } = options;
 
     // Load script if not loaded
     if (!get().isMidtransScriptLoaded) {
       get().loadMidtransScript();
-
       // If script is not loaded, show error and return
       if (!get().isMidtransScriptLoaded) {
         toast.error(
@@ -89,7 +88,14 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const snapToken = await createPayment(paymentType, paymentId);
+      // Gunakan getExistingPayment jika useExisting=true, jika tidak gunakan createPayment
+      let snapToken;
+
+      if (useExisting) {
+        snapToken = await getExistingPayment(paymentType, paymentId);
+      } else {
+        snapToken = await createPayment(paymentType, paymentId);
+      }
 
       if (!snapToken) {
         toast.error("Gagal mendapatkan token pembayaran");

@@ -258,6 +258,7 @@ function RoomBookingDetailPage() {
                           dangerouslySetInnerHTML={{
                             __html: atob(selectedRoomBooking.barcode),
                           }}
+                          className="w-64 h-64"
                         />
                       </div>
                     </div>

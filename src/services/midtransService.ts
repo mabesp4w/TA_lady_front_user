@@ -1,6 +1,6 @@
 /** @format */
 
-// src/services/midtransService.ts
+// src/services/midtransService.ts - Tambahkan fungsi baru untuk mengambil token pembayaran yang sudah ada
 
 import axios from "axios";
 import { BASE_URL } from "./baseURL";
@@ -18,7 +18,7 @@ export interface MidtransPaymentOptions {
   onClose?: () => void;
 }
 
-// Fungsi untuk membuat token pembayaran
+// Fungsi untuk membuat token pembayaran baru
 export const createPayment = async (
   paymentType: PaymentType,
   paymentId: string
@@ -51,6 +51,39 @@ export const createPayment = async (
     return null;
   } catch (error) {
     console.error("Error creating payment:", error);
+    throw error;
+  }
+};
+
+// Fungsi baru untuk mengambil token pembayaran yang sudah ada
+export const getExistingPayment = async (
+  paymentType: PaymentType,
+  paymentId: string
+): Promise<string | null> => {
+  try {
+    const token = Cookies.get("token");
+
+    if (!token) {
+      throw new Error("Token tidak ditemukan");
+    }
+
+    const response = await axios.get(`${BASE_URL}/api/payments/existing`, {
+      params: {
+        jenis_pembayaran: paymentType,
+        pembayaran_id: paymentId,
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.data.status && response.data.data.snap_token) {
+      return response.data.data.snap_token;
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error getting existing payment:", error);
     throw error;
   }
 };

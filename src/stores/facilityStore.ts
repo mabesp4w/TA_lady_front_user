@@ -43,22 +43,40 @@ export const useFacilityStore = create<FacilityState>((set) => ({
   getFacility: async (id: string) => {
     set({ isLoading: true, error: null, selectedFacility: null });
     try {
+      console.log(`Fetching facility with ID: ${id}`);
+
       const response = await axios.get<ApiResponse<FasilitasType>>(
         `${BASE_URL}/api/facilities/${id}`
       );
 
+      console.log("API Response:", response.data);
+
       if (response.data.status && response.data.data) {
-        set({ selectedFacility: response.data.data });
+        set({ selectedFacility: response.data.data, isLoading: false });
       } else {
-        set({ error: response.data.message || "Failed to fetch facility" });
+        // Store the exact error message from API
+        set({
+          error: response.data.message || "Failed to fetch facility details",
+          isLoading: false,
+        });
+        console.error("API response error:", response.data);
       }
     } catch (error) {
       console.error(`Error fetching facility with id ${id}:`, error);
-      set({
-        error: "Failed to fetch facility details. Please try again later.",
-      });
-    } finally {
-      set({ isLoading: false });
+
+      // Better error handling for axios errors
+      if (axios.isAxiosError(error) && error.response) {
+        set({
+          error:
+            error.response.data.message || "Failed to fetch facility details",
+          isLoading: false,
+        });
+      } else {
+        set({
+          error: "Failed to fetch facility details. Please try again later.",
+          isLoading: false,
+        });
+      }
     }
   },
 }));
