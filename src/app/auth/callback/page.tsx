@@ -3,28 +3,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import axios from "axios";
-import { BASE_URL } from "@/services/baseURL";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface MeResponse {
-  status: boolean;
-  user: User;
-  profile: any;
-}
+import Cookies from "js-cookie";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function AuthCallback() {
   const [message, setMessage] = useState<string>("Memproses autentikasi...");
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { checkAuth } = useAuthStore();
 
   useEffect(() => {
     // Di App Router, gunakan useSearchParams untuk mendapatkan query parameters
@@ -32,32 +18,22 @@ export default function AuthCallback() {
 
     if (token) {
       // Simpan token
-      localStorage.setItem("auth_token", token);
+      Cookies.set("token", token);
 
       // Dapatkan data user
-      fetchUserData(token);
+      fetchUserData();
     } else {
       // Jika tidak ada token di URL
       setMessage("Token tidak ditemukan di URL. Silakan coba login kembali.");
     }
   }, [searchParams]);
 
-  const fetchUserData = async (token: string) => {
+  const fetchUserData = async () => {
     try {
-      // Set header Authorization
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-      // Get user data
-      const response = await axios.get<MeResponse>(`${BASE_URL}/api/me`);
-
-      if (response.data.status) {
-        // Simpan data user
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-
-        // Redirect ke dashboard
-        router.push("/dashboard");
-      } else {
-        setMessage("Gagal mendapatkan data user");
+      const cek = await checkAuth();
+      if (cek) {
+        setMessage("Login berhasil. Akan dialihkan ke halaman utama");
+        router.push("/");
       }
     } catch (error: any) {
       setMessage(

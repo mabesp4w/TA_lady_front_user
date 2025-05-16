@@ -1,11 +1,10 @@
 /** @format */
 
 // src/components/home/AboutSection.tsx
-import Link from "next/link";
-import { ChevronRight, MapPin, Clock, PhoneCall } from "lucide-react";
 import ResortMap from "@/components/maps/ResortMap";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import { MapPin, Clock, PhoneCall } from "lucide-react";
 
 export default function AboutSection() {
   const [ref, inView] = useInView({
@@ -34,15 +33,6 @@ export default function AboutSection() {
             menawarkan berbagai fasilitas premium dan pelayanan terbaik untuk
             membuat liburan Anda menjadi pengalaman yang tak terlupakan.
           </p>
-
-          <div className="mb-6">
-            <Link
-              href="/about"
-              className="text-primary flex items-center font-medium hover:underline"
-            >
-              Pelajari Lebih Lanjut <ChevronRight size={16} />
-            </Link>
-          </div>
 
           <div className="space-y-3 mb-6">
             <div className="flex items-center">
