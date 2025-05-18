@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { GambarFasilitasType } from "@/types";
+import { BASE_URL } from "@/services/baseURL";
 
 interface ImageGalleryProps {
   images: GambarFasilitasType[];
@@ -32,7 +33,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
     <div className="relative rounded-lg overflow-hidden">
       <div className="relative h-64 md:h-80">
         <Image
-          src={images[currentImageIndex].jalur_gambar}
+          src={`${BASE_URL}/${images[currentImageIndex].jalur_gambar}`}
           alt={`Facility image ${currentImageIndex + 1}`}
           fill
           className="object-cover"

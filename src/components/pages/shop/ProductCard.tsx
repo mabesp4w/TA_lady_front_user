@@ -8,6 +8,8 @@ import QuantitySelector from "./QuantitySelector";
 import Button from "@/components/ui/Button";
 import { useAuthStore } from "@/stores/authStore";
 import { useCartStore } from "@/stores/cartStore";
+import { BASE_URL } from "@/services/baseURL";
+import showRupiah from "@/services/rupiah";
 
 interface Product {
   id: string;
@@ -56,7 +58,7 @@ export default function ProductCard({
       {product.jalur_gambar ? (
         <div className="relative h-48 w-full">
           <Image
-            src={product.jalur_gambar}
+            src={`${BASE_URL}/${product.jalur_gambar}`}
             alt={product.nm_produk}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -77,7 +79,7 @@ export default function ProductCard({
       <div className="p-4">
         <h3 className="text-lg font-semibold mb-2">{product.nm_produk}</h3>
         <p className="text-lg font-bold text-primary mb-4">
-          Rp{product.harga.toLocaleString("id-ID")}
+          {showRupiah(product.harga)}
         </p>
 
         {product.tersedia ? (

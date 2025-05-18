@@ -338,7 +338,7 @@ export const useBookingStore = create<BookingState>((set) => ({
         return false;
       }
 
-      const response = await axios.put(
+      const response = await axios.post(
         `${BASE_URL}/api/room-bookings/${id}/cancel`,
         {},
         {
@@ -397,7 +397,7 @@ export const useBookingStore = create<BookingState>((set) => ({
         return false;
       }
 
-      const response = await axios.put(
+      const response = await axios.post(
         `${BASE_URL}/api/facility-bookings/${id}/cancel`,
         {},
         {

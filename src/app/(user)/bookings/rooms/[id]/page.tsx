@@ -17,6 +17,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { BASE_URL } from "@/services/baseURL";
 import { usePaymentStore } from "@/stores/paymentStore";
+import showRupiah from "@/services/rupiah";
 
 function RoomBookingDetailPage() {
   const params = useParams();
@@ -231,8 +232,7 @@ function RoomBookingDetailPage() {
                   <div>
                     <p className="text-sm text-gray-600">Total Harga</p>
                     <p className="text-lg font-bold">
-                      Rp
-                      {selectedRoomBooking.total_harga.toLocaleString("id-ID")}
+                      {showRupiah(selectedRoomBooking.total_harga)}
                     </p>
                   </div>
 

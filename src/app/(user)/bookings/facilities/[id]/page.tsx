@@ -16,6 +16,8 @@ import withAuth from "@/components/hoc/withAuth";
 import Link from "next/link";
 import Image from "next/image";
 import { usePaymentStore } from "@/stores/paymentStore";
+import { BASE_URL } from "@/services/baseURL";
+import showRupiah from "@/services/rupiah";
 
 function FacilityBookingDetailPage() {
   const params = useParams();
@@ -183,10 +185,7 @@ function FacilityBookingDetailPage() {
                     <Image
                       width={500}
                       height={500}
-                      src={
-                        selectedFacilityBooking.fasilitas.gambar_fasilitas[0]
-                          .jalur_gambar
-                      }
+                      src={`${BASE_URL}/${selectedFacilityBooking.fasilitas.gambar_fasilitas[0].jalur_gambar}`}
                       alt={selectedFacilityBooking.fasilitas.nm_fasilitas}
                       className="w-full h-48 md:h-full object-cover"
                     />
@@ -246,10 +245,7 @@ function FacilityBookingDetailPage() {
                   <div>
                     <p className="text-sm text-gray-600">Total Harga</p>
                     <p className="text-lg font-bold">
-                      Rp
-                      {selectedFacilityBooking.total_harga.toLocaleString(
-                        "id-ID"
-                      )}
+                      {showRupiah(selectedFacilityBooking.total_harga)}
                     </p>
                   </div>
 

@@ -5,6 +5,7 @@ import moment from "moment";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import showRupiah from "@/services/rupiah";
 
 interface RoomBooking {
   id: string;
@@ -93,7 +94,7 @@ export default function RoomBookingCard({
         <div>
           <span className="text-gray-600 text-sm">Total:</span>
           <span className="font-bold text-primary ml-2">
-            Rp{booking.total_harga.toLocaleString("id-ID")}
+            {showRupiah(booking.total_harga)}
           </span>
         </div>
         {getPaymentStatusBadge(booking.status_pembayaran)}

@@ -5,6 +5,8 @@ import { Trash2 } from "lucide-react";
 import { KeranjangType } from "@/types";
 import QuantitySelector from "@/components/pages/shop/QuantitySelector";
 import Button from "@/components/ui/Button";
+import showRupiah from "@/services/rupiah";
+import { BASE_URL } from "@/services/baseURL";
 
 interface CartItemProps {
   item: KeranjangType;
@@ -18,16 +20,16 @@ export default function CartItem({
   onRemove,
 }: CartItemProps) {
   const handleIncrement = () => {
-    onUpdateQuantity(item.id, item.jumlah + 1);
+    onUpdateQuantity(item.id, parseInt(item.jumlah as any) + 1);
   };
 
   const handleDecrement = () => {
     if (item.jumlah > 1) {
-      onUpdateQuantity(item.id, item.jumlah - 1);
+      onUpdateQuantity(item.id, parseInt(item.jumlah as any) - 1);
     }
   };
 
-  const subtotal = (item.produk?.harga || 0) * item.jumlah;
+  const subtotal = (item.produk?.harga || 0) * parseInt(item.jumlah as any);
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 flex flex-col md:flex-row gap-4">
@@ -35,7 +37,7 @@ export default function CartItem({
       {item.produk?.jalur_gambar ? (
         <div className="relative h-24 w-24 md:h-32 md:w-32 flex-shrink-0">
           <Image
-            src={item.produk.jalur_gambar}
+            src={`${BASE_URL}/${item.produk.jalur_gambar}`}
             alt={item.produk.nm_produk}
             fill
             sizes="(max-width: 768px) 96px, 128px"
@@ -52,9 +54,7 @@ export default function CartItem({
       <div className="flex-grow flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold">{item.produk?.nm_produk}</h3>
-          <p className="text-gray-600">
-            Rp{(item.produk?.harga || 0).toLocaleString("id-ID")}
-          </p>
+          <p className="text-gray-600">{showRupiah(item.produk?.harga || 0)}</p>
         </div>
 
         {/* Quantity & Actions */}
@@ -67,7 +67,7 @@ export default function CartItem({
 
           <div className="flex flex-col items-end">
             <p className="font-bold text-primary mb-2">
-              Rp{subtotal.toLocaleString("id-ID")}
+              {showRupiah(subtotal)}
             </p>
             <Button
               variant="outline"
