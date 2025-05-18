@@ -40,7 +40,26 @@ export default function Login() {
 
   // Handler untuk login Google
   const handleGoogleLogin = () => {
-    window.location.href = `${BASE_URL}/api/auth/google`;
+    const url = `${BASE_URL}/api/auth/google`;
+    // Deteksi jika sedang berjalan di dalam WebView
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    if (window.ReactNativeWebView) {
+      // Kirim pesan ke React Native
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      window.ReactNativeWebView.postMessage(
+        JSON.stringify({
+          type: "GOOGLE_LOGIN",
+          url,
+        })
+      );
+      // Hindari navigasi default
+      return false;
+    } else {
+      // Jika bukan di WebView, jalankan navigasi normal
+      window.location.href = url;
+    }
   };
 
   return (
