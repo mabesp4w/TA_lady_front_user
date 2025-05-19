@@ -44,10 +44,18 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
     }
 
     try {
-      const scriptUrl =
-        process.env.NODE_ENV === "production"
-          ? "https://app.midtrans.com/snap/snap.js"
-          : "https://app.sandbox.midtrans.com/snap/snap.js";
+      // Default ke sandbox jika tidak ditentukan
+      const isSandbox = process.env.NEXT_PUBLIC_MIDTRANS_IS_SANDBOX !== "false";
+      const scriptUrl = isSandbox
+        ? "https://app.sandbox.midtrans.com/snap/snap.js"
+        : "https://app.midtrans.com/snap/snap.js";
+
+      console.log(
+        "Using Midtrans in",
+        isSandbox ? "SANDBOX" : "PRODUCTION",
+        "mode"
+      );
+      console.log("Script URL:", scriptUrl);
       const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || "";
 
       const script = document.createElement("script");
